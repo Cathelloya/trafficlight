@@ -5,7 +5,7 @@ module sequence_generator(
     input wire S0,
     input wire S1,
     input wire S2,
-    input wire S3,
+    input wire S3,//111
     input wire S4,
     output reg [1:0] out,    // 2位输出信号
     output reg [31:0] counter // 用于倒计时的32位计数器
