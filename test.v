@@ -58,7 +58,7 @@ always @(posedge clk or posedge reset) begin
             LEFT: begin
                 if (counter <= 1) begin
                     state <= OFF;
-                    counter <= OFF_T;
+                    counter <= YELLOW_T;
                     out <= OFF;
                 end else begin
                     counter <= counter - 1;
