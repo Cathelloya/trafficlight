@@ -2,11 +2,6 @@ module sequence_generator(
     input wire clk,          // 时钟信号
     input wire reset,        // 复位信号
     input wire switch,        // 开关输入信号
-    input wire S0,
-    input wire S1,
-    input wire S2,
-    input wire S3,
-    input wire S4,
     output reg [1:0] out,    // 2位输出信号
     output reg [31:0] counter // 用于倒计时的32位计数器
 );
@@ -63,7 +58,7 @@ always @(posedge clk or posedge reset) begin
             LEFT: begin
                 if (counter <= 1) begin
                     state <= OFF;
-                    counter <= YELLOW_T;
+                    counter <= OFF_T;
                     out <= OFF;
                 end else begin
                     counter <= counter - 1;
