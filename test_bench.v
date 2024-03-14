@@ -12,6 +12,9 @@ reg S0, S1, S2, S3, S4; // 新增输入信号
 wire [1:0] out;
 wire [31:0] counter;
 
+wire [1:0] out2;
+wire [31:0] counter2;
+
 // 实例化被测试的模块
 sequence_generator uut (
     .clk(clk),
@@ -23,7 +26,9 @@ sequence_generator uut (
     .S3(S3),
     .S4(S4),
     .out(out),
-    .counter(counter)
+    .counter(counter),
+    .out2(out2),
+    .counter2(counter2)
 );
 
 // 生成时钟信号

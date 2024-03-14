@@ -8,7 +8,9 @@ module sequence_generator(
     input wire S3,
     input wire S4,
     output reg [1:0] out,    // 2位输出信号
-    output reg [31:0] counter // 用于倒计时的32位计数器
+    output reg [31:0] counter, // 用于倒计时的32位计数器
+    output reg [1:0] out2,    // 用于测试的第二个输出信号
+    output reg [31:0] counter2 // 用于测试的第二个计数器
 );
 
 // 定义前一个状态
@@ -24,7 +26,7 @@ localparam OFF = 2'b00,
            RIGHT = 2'b11;
 
 // 定义时间参数
-reg [31:0] FORWARD_T, RIGHT_T, LEFT_T, YELLOW_T;
+reg [31:0] FORWARD_T, RIGHT_T, LEFT_T, OFF_T;
 
 // 状态转移逻辑
 always @(posedge clk or posedge reset) begin
@@ -32,46 +34,74 @@ always @(posedge clk or posedge reset) begin
         // 异步复位
         state <= OFF;
         counter <= 0;
+        counter2 <= 0;
         out <= 4'b0000;
+        out2 <= 4'b0000;
         FORWARD_T <= 15;
         RIGHT_T <= 10;
         LEFT_T <= 10;
-        YELLOW_T <= 3;
+        OFF_T <= 3;
     end else if (switch) begin
         // 开关被按下，保持counter为0和state为OFF
-        state <= OFF;
+        state <= OFF; 
         counter <= 0;
+        counter2 <= 0;
         out <= 4'b0000;
+        out2 <= 4'b0000;
     end else begin
         case (state)
             FORWARD: begin
                 if (counter <= 1) begin
                     state <= RIGHT;
+                    //南北方向
                     counter <= RIGHT_T;
                     out <= RIGHT;
+                    //东西方向
+                    counter2 <= RIGHT_T;
+                    out2 <= LEFT;
                 end else begin
+                    //南北方向
                     counter <= counter - 1;
                     out <= FORWARD;
+                    //东西方向
+                    counter2 <= counter2 - 1;
+                    out2 <= OFF;
                 end
             end
             RIGHT: begin
                 if (counter <= 1) begin
                     state <= LEFT;
+                    //南北方向
                     counter <= LEFT_T;
                     out <= LEFT;
+                    //东西方向
+                    counter2 <= LEFT_T;
+                    out2 <= RIGHT;
                 end else begin
+                    //南北方向
                     counter <= counter - 1;
                     out <= RIGHT;
+                    //东西方向
+                    counter2 <= counter2 - 1;
+                    out2 <= LEFT;
                 end
             end
             LEFT: begin
                 if (counter <= 1) begin
                     state <= OFF;
-                    counter <= YELLOW_T;
+                    //南北方向
+                    counter <= OFF_T;
                     out <= OFF;
+                    //东西方向
+                    counter2 <= OFF_T;
+                    out2 <= FORWARD;
                 end else begin
+                    //南北方向
                     counter <= counter - 1;
                     out <= LEFT;
+                    //东西方向
+                    counter2 <= counter2 - 1;
+                    out2 <= RIGHT;
                 end
             end
             OFF: begin
@@ -79,11 +109,19 @@ always @(posedge clk or posedge reset) begin
                 if (!switch) begin
                     if (counter <= 1) begin
                         state <= FORWARD;
+                        //南北方向
                         counter <= FORWARD_T;
                         out <= FORWARD;
+                        //东西方向
+                        counter2 <= FORWARD_T;
+                        out2 <= OFF;
                     end else begin
+                        //南北方向
                         counter <= counter - 1;
                         out <= OFF;
+                        //东西方向
+                        counter2 <= counter2 - 1;
+                        out2 <= FORWARD;
                     end
                 end
             end
@@ -119,12 +157,12 @@ always @(posedge clk) begin
             if (S1 && !S1_prev) begin
                 LEFT_T  <= LEFT_T  - 1;
             end
-        end else if (!S3 && !S0) begin // 调整YELLOW_T
+        end else if (!S3 && !S0) begin // 调整OFF_T
             if (S4 && !S4_prev) begin
-                YELLOW_T <= YELLOW_T  + 1;
+                OFF_T <= OFF_T  + 1;
             end
             if (S1 && !S1_prev) begin
-                YELLOW_T  <= YELLOW_T - 1;
+                OFF_T  <= OFF_T - 1;
             end
         end
     end
