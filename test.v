@@ -5,7 +5,7 @@ module sequence_generator(
     input wire S0,
     input wire S1,
     input wire S2,
-    input wire S3,//111
+    input wire S3,
     input wire S4,
     output reg [1:0] out,    // 2位输出信号
     output reg [31:0] counter // 用于倒计时的32位计数器
@@ -104,27 +104,29 @@ always @(posedge clk) begin
             end
             if (S1 && !S1_prev) begin
                 FORWARD_T <= FORWARD_T - 1;
+            end
         end else if (S3 && !S0) begin // 检测S3的变化来调整RIGHT_T
-            if (S4) begin
+            if (S4 && !S4_prev) begin
                 RIGHT_T <= RIGHT_T + 1;
-            end else if (S1) begin
+            end
+            if (S1 && !S1_prev) begin
                 RIGHT_T <= RIGHT_T - 1;
             end
         end else if (!S3 && S0) begin // 检测S0的变化来调整LEFT_T
-            if (S4) begin
-                LEFT_T <= LEFT_T + 1;
-            end else if (S1) begin
-                LEFT_T <= LEFT_T - 1;
+            if (S4 && !S4_prev) begin
+                LEFT_T <= LEFT_T  + 1;
+            end
+            if (S1 && !S1_prev) begin
+                LEFT_T  <= LEFT_T  - 1;
             end
         end else if (!S3 && !S0) begin // 调整YELLOW_T
-            if (S4) begin
-                YELLOW_T <= YELLOW_T + 1;
-            end else if (S1) begin
-                YELLOW_T <= YELLOW_T - 1;
+            if (S4 && !S4_prev) begin
+                YELLOW_T <= YELLOW_T  + 1;
+            end
+            if (S1 && !S1_prev) begin
+                YELLOW_T  <= YELLOW_T - 1;
             end
         end
     end
 end
-end
-
 endmodule
