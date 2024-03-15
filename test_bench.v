@@ -15,6 +15,7 @@ wire [31:0] counter;
 wire [1:0] out2;
 wire [31:0] counter2;
 
+
 // 实例化被测试的模块
 sequence_generator uut (
     .clk(clk),
