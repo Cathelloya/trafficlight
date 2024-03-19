@@ -70,7 +70,7 @@ always @(posedge clk or posedge reset) begin
         if (flag >= 1 && flag <= PERIOD)
         begin
             out2 <= OFF;
-            counter2 <= 0;
+            counter2 <= PERIOD - flag + 1;
             
             case (state)
             FORWARD: begin
@@ -122,7 +122,7 @@ always @(posedge clk or posedge reset) begin
         else if (flag > PERIOD && flag <= 2 * PERIOD) 
         begin
             out <= OFF;
-            counter <= 0;
+            counter <= 2 * PERIOD - flag + 1;
             case (state)
             FORWARD: begin
                 if (counter2 <= 1) begin
