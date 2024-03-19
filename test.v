@@ -14,7 +14,7 @@ module sequence_generator(
 );
 
 // 定义前一个状态
-reg S4_prev, S1_prev; // 用于保存前一个时钟周期的 S3 和 S2 的值
+reg S4_prev, S1_prev, S2_prev; // 用于保存前一个时钟周期的 S3 和 S2 的值
 
 // 定义状态变量
 reg [1:0] state;
@@ -67,13 +67,13 @@ always @(posedge clk or posedge reset) begin
         end
 
         //判断flag的值，来切换南北方向
-        if (flag >= 1 && flag <= PERIOD)
+        if (flag >= 0 && flag <= PERIOD)
         begin
             out2 <= OFF;
             counter2 <= PERIOD - flag + 1;
             
             case (state)
-            FORWARD: begin
+            FORWARD: begin //2
                 if (counter <= 1) begin
                     state <= RIGHT;
                     counter <= RIGHT_T;
@@ -84,7 +84,7 @@ always @(posedge clk or posedge reset) begin
                     out <= FORWARD;
                 end
             end
-            RIGHT: begin
+            RIGHT: begin //3
                 if (counter <= 1) begin
                     state <= LEFT;
                     counter <= LEFT_T;
@@ -94,7 +94,7 @@ always @(posedge clk or posedge reset) begin
                     out <= RIGHT;
                 end
             end
-            LEFT: begin
+            LEFT: begin //1
                 if (counter <= 1) begin
                     state <= OFF;
                     counter <= OFF_T;
@@ -104,7 +104,7 @@ always @(posedge clk or posedge reset) begin
                     out <= LEFT;
                 end
             end
-            OFF: begin
+            OFF: begin //0
                 if (counter <= 1) begin
                     state <= FORWARD;
                     counter <= FORWARD_T;
@@ -124,7 +124,7 @@ always @(posedge clk or posedge reset) begin
             out <= OFF;
             counter <= 2 * PERIOD - flag + 1;
             case (state)
-            FORWARD: begin
+            FORWARD: begin //2
                 if (counter2 <= 1) begin
                     state <= RIGHT;
                     counter2 <= RIGHT_T;
@@ -134,7 +134,7 @@ always @(posedge clk or posedge reset) begin
                     out2 <= FORWARD;
                 end
             end
-            RIGHT: begin
+            RIGHT: begin //3
                 if (counter2 <= 1) begin
                     state <= LEFT;
                     counter2 <= LEFT_T;
@@ -144,7 +144,7 @@ always @(posedge clk or posedge reset) begin
                     out2 <= RIGHT;
                 end
             end
-            LEFT: begin
+            LEFT: begin //1
                 if (counter2 <= 1) begin
                     state <= OFF;
                     counter2 <= OFF_T;
@@ -154,7 +154,7 @@ always @(posedge clk or posedge reset) begin
                     out2 <= LEFT;
                 end
             end
-            OFF: begin
+            OFF: begin //0
                 if (counter2 <= 1) begin
                     state <= FORWARD;
                     counter2 <= FORWARD_T;
@@ -173,6 +173,7 @@ end
 always @(posedge clk) begin
     S4_prev <= S4;
     S1_prev <= S1;
+    S2_prev <= S2;
 
     if (S2) begin
         // 检测S3和S0的变化来调整FORWARD_T
@@ -206,5 +207,15 @@ always @(posedge clk) begin
             end
         end
     end
+    else if (!S2 && S2_prev) begin
+        // 异步复位
+        state <= OFF;
+        counter <= 0;
+        counter2 <= 0;
+        out <= 4'b0000;
+        out2 <= 4'b0000;
+        flag<=0;
+    end
+
 end
 endmodule
